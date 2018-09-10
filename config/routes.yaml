@@ -1,3 +1,9 @@
 #index:
 #    path: /
 #    controller: App\Controller\DefaultController::index
+
+app_routes:
+    type: rest
+    resource: 'config/invoices_routes.yml'
+    prefix: /api
+

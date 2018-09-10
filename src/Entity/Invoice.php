@@ -7,7 +7,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Entity\Repository\InvoiceRepository")
  * @ORM\HasLifecycleCallbacks()
  */
 class Invoice
@@ -49,12 +49,12 @@ class Invoice
      * @Groups({"index", "get", "create", "update"})
      */
     private $status = 0;
-//
-//    /**
-//     * @ORM\Column(type="json")
-//     * @Groups({"index", "get", "create", "update"})
-//     */
-//    private $items = [];
+
+    /**
+     * @ORM\Column(type="json")
+     * @Groups({"index", "get", "create", "update"})
+     */
+    private $items = [];
 
     /**
      * @return mixed
