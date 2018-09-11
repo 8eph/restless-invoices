@@ -3,6 +3,7 @@
 namespace App\Doctrine;
 
 use App\Entity\Invoice;
+use App\Entity\Item;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
 class StatusChangeEnforcementListener
@@ -19,7 +20,11 @@ class StatusChangeEnforcementListener
 
             // if we are creating an Invoice with a Published/real status right off the bat
             if (Invoice::STATUS_REAL === $changeSet['status'][1]) {
-
+                /** @var Invoice $entity */
+                /** @var Item $item */
+                foreach ($entity->getItems() as $item) {
+                    $item->set
+                }
             }
         }
 
