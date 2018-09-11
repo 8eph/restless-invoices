@@ -1,8 +1,8 @@
 invoices:
-    type:     rest
+    type: rest
     resource: App\Controller\InvoiceController
 
 items:
-    type:     rest
-    parent:   invoices
-    resource: App\Controller\ItemController
+    type: rest
+    parent: invoices
+    resource: 'App\Controller\ItemController'

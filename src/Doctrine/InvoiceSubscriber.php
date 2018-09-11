@@ -5,11 +5,12 @@ namespace App\Doctrine;
 use App\Entity\Invoice;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 
-class InvoiceNameGenerationSubscriber implements EventSubscriber
+class InvoiceSubscriber implements EventSubscriber
 {
     const PAD_LENGTH = 6;
 
@@ -21,22 +22,27 @@ class InvoiceNameGenerationSubscriber implements EventSubscriber
     public function getSubscribedEvents()
     {
         return [
-            Events::postPersist
+            Events::postPersist,
         ];
     }
 
+    /**
+     * @param LifecycleEventArgs $lifecycleEventArgs
+     */
     public function postPersist(LifecycleEventArgs $lifecycleEventArgs)
     {
         $entity = $lifecycleEventArgs->getEntity();
 
         if ($entity instanceof Invoice) {
+            $lastInsertId = $lifecycleEventArgs->getEntityManager()->getConnection()->lastInsertId();
 
             $entity->setName(sprintf('INV-%s-%s',
                 date('y'),
-                str_pad((int) $lifecycleEventArgs->getEntityManager()->getConnection()->lastInsertId(), self::PAD_LENGTH, 0, STR_PAD_LEFT)
+                str_pad((int) $lastInsertId, self::PAD_LENGTH, 0, STR_PAD_LEFT)
             ));
 
             try {
+                if ($entity)
                 $lifecycleEventArgs->getEntityManager()->flush($entity);
             } catch (OptimisticLockException $e) {
                 // do nothing

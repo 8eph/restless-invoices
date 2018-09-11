@@ -2,59 +2,79 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass="App\Entity\Repository\InvoiceRepository")
  * @ORM\HasLifecycleCallbacks()
  */
-class Invoice
+class Invoice implements EntityInterface
 {
+    const STATUS_DRAFT = 0;
+    const STATUS_REAL = 1;
+    const STATUS_CREDITED = 2;
+    const NOT_PAID = false;
+    const PAID = true;
+
+    public function __construct()
+    {
+        $this->items = new ArrayCollection();
+    }
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Groups({"index", "get", "create", "update"})
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Groups({"index", "get", "create"})
+     * @Groups({"index", "get"})
      */
-    private $name;
+    protected $name;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"index", "get", "create", "update"})
+     * @Assert\Choice({"EUR", "USD", "CAD", "JPY"})
      */
-    private $currency;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     * @Groups({"index", "get", "create", "update"})
-     */
-    private $description;
+    protected $currency;
 
     /**
      * @ORM\Column(type="datetimetz")
      * @Groups({"index", "get", "create", "update"})
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
      * @ORM\Column(type="smallint")
      * @Groups({"index", "get", "create", "update"})
+     * @Assert\Range(min=0, max=2)
      */
-    private $status = 0;
+    protected $status = self::STATUS_DRAFT;
 
     /**
-     * @ORM\Column(type="json")
+     * @ORM\Column(type="boolean")
+     */
+    protected $paid = self::NOT_PAID;
+
+    /**
+     * @MaxDepth(1)
+     * @ORM\OneToMany(targetEntity="Item", mappedBy="invoice", cascade={"all"}, orphanRemoval=true)
      * @Groups({"index", "get", "create", "update"})
      */
-    private $items = [];
+    protected $items;
+
+    /**
+     * @var Invoice|null
+     * @ORM\OneToOne(targetEntity="Invoice")
+     */
+    protected $originalInvoice;
 
     /**
      * @return mixed
@@ -71,24 +91,6 @@ class Invoice
     public function setCurrency($currency)
     {
         $this->currency = $currency;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    /**
-     * @param mixed $description
-     * @return Invoice
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
         return $this;
     }
 
@@ -118,25 +120,7 @@ class Invoice
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getItems()
-    {
-        return $this->items;
-    }
-
-    /**
-     * @param mixed $items
-     * @return Invoice
-     */
-    public function setItems($items)
-    {
-        $this->items = $items;
-        return $this;
-    }
-
-    public function getId(): string
+    public function getId():? int
     {
         return $this->id;
     }
@@ -166,8 +150,56 @@ class Invoice
      */
     public function setName($name): void
     {
+        // normally the entity should have no business logic but we know upfront that this will be modified by a postPersist listener
+        // and this is the simplest way to ensure immutability
         if (empty($this->name)) {
             $this->name = $name;
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getItems(): array
+    {
+        return $this->items->toArray();
+    }
+
+    public function setItems(array $items)
+    {
+        $this->items = new ArrayCollection($items);
+    }
+
+    /**
+     * @param mixed $paid
+     * @return Invoice
+     */
+    public function setPaid($paid)
+    {
+        $this->paid = $paid;
+        return $this;
+    }
+
+    public function isPaid()
+    {
+        return $this->paid;
+    }
+
+    /**
+     * @param Invoice|null $originalInvoice
+     * @return Invoice
+     */
+    public function setOriginalInvoice(?Invoice $originalInvoice): Invoice
+    {
+        $this->originalInvoice = $originalInvoice;
+        return $this;
+    }
+
+    /**
+     * @return Invoice|null
+     */
+    public function getOriginalInvoice(): ?Invoice
+    {
+        return $this->originalInvoice;
     }
 }

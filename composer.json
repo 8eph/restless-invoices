@@ -12,6 +12,8 @@
         "symfony/maker-bundle": "^1.7",
         "symfony/orm-pack": "^1.0",
         "symfony/serializer-pack": "^1.0",
+        "symfony/validator": "*",
+        "symfony/workflow": "*",
         "symfony/yaml": "*"
     },
     "require-dev": {

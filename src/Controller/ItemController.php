@@ -1,10 +1,10 @@
 <?php
 
-
 namespace App\Controller;
 
+use FOS\RestBundle\Controller\FOSRestController;
 
-class ItemController
+class ItemController extends FOSRestController
 {
     public function postItemAction($invoiceId, $itemId)
     {
