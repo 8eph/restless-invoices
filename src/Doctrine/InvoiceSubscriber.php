@@ -5,11 +5,13 @@ namespace App\Doctrine;
 use App\Entity\Invoice;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 
+/**
+ * Generates Invoice name on creation.
+ */
 class InvoiceSubscriber implements EventSubscriber
 {
     const PAD_LENGTH = 6;

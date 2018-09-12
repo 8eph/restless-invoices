@@ -11,7 +11,7 @@ class InvoiceFactory
     {
         $creditInvoice = (new Invoice())
             ->setStatus(Invoice::STATUS_CREDITED)
-            ->setPaid(true)
+            ->setPaid(Invoice::PAID)
             ->setCurrency($invoice->getCurrency())
             ->setOriginalInvoice($invoice);
 

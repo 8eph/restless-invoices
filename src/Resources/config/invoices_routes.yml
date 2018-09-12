@@ -1,8 +1,0 @@
-invoices:
-    type: rest
-    resource: App\Controller\InvoiceController
-
-items:
-    type: rest
-    parent: invoices
-    resource: 'App\Controller\ItemController'

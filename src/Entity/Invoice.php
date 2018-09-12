@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 /**
@@ -47,9 +46,15 @@ class Invoice implements EntityInterface
 
     /**
      * @ORM\Column(type="datetimetz")
-     * @Groups({"index", "get", "create", "update"})
+     * @Groups({"index", "get"})
      */
     protected $createdAt;
+
+    /**
+     * @ORM\Column(type="datetimetz")
+     * @Groups({"index", "get"})
+     */
+    protected $publishedAt;
 
     /**
      * @ORM\Column(type="smallint")
@@ -64,14 +69,13 @@ class Invoice implements EntityInterface
     protected $paid = self::NOT_PAID;
 
     /**
-     * @MaxDepth(1)
      * @ORM\OneToMany(targetEntity="Item", mappedBy="invoice", cascade={"all"}, orphanRemoval=true)
      * @Groups({"index", "get", "create", "update"})
      */
     protected $items;
 
     /**
-     * @var Invoice|null
+     * @var Invoice|null    Stores the original invoice of a CREDIT-type invoice.
      * @ORM\OneToOne(targetEntity="Invoice")
      */
     protected $originalInvoice;
@@ -150,7 +154,7 @@ class Invoice implements EntityInterface
      */
     public function setName($name): void
     {
-        // normally the entity should have no business logic but we know upfront that this will be modified by a postPersist listener
+        // normally the entity should have no business logic but we know upfront that this will be modified by a postPersist listener before a DB flush
         // and this is the simplest way to ensure immutability
         if (empty($this->name)) {
             $this->name = $name;
@@ -201,5 +205,23 @@ class Invoice implements EntityInterface
     public function getOriginalInvoice(): ?Invoice
     {
         return $this->originalInvoice;
+    }
+
+    /**
+     * @param mixed $publishedAt
+     * @return Invoice
+     */
+    public function setPublishedAt($publishedAt)
+    {
+        $this->publishedAt = $publishedAt;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPublishedAt()
+    {
+        return $this->publishedAt;
     }
 }

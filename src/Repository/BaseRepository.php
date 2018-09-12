@@ -11,6 +11,12 @@ use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * This is bad.
+ * Repositories should only query data. Services should manipulate it.
+ *
+ * Reasoning: trying my darndest here to submit this code before 2025.
+ */
 class BaseRepository extends ServiceEntityRepository
 {
     const ENTITY_CLASS = null;
@@ -94,6 +100,10 @@ class BaseRepository extends ServiceEntityRepository
 
     public function persist($entity)
     {
-        $this->getEntityManager()->persist($entity);
+        try {
+            $this->getEntityManager()->persist($entity);
+        } catch (ORMException $e) {
+            // do nothing
+        }
     }
 }

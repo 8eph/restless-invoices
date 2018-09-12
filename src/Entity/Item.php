@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -22,7 +21,6 @@ class Item implements EntityInterface
     protected $id;
 
     /**
-     * @MaxDepth(1)
      * @var Invoice
      * @ORM\ManyToOne(targetEntity="Invoice", inversedBy="items", cascade={"all"})
      * @ORM\JoinColumn(name="invoice_id", referencedColumnName="id")
@@ -39,7 +37,7 @@ class Item implements EntityInterface
 
     /**
      * @ORM\Column(type="decimal", scale=2, nullable=true)
-     * @Groups({"index", "get", "create", "update"})
+     * @Groups({"index", "get"})
      */
     protected $priceEur;
 
@@ -138,6 +136,7 @@ class Item implements EntityInterface
      */
     public function validate(ExecutionContextInterface $context, $payload)
     {
+        // no validation for Eur price as it is auto-generated
         preg_match('/^\d+(\.\d{1,2})?$/', $this->getPrice(), $matches);
         if (!$matches) {
             $context->buildViolation('Invalid number format for price. Example valid values: 65.12, 3.3, 10')

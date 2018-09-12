@@ -5,10 +5,14 @@ namespace App\Controller;
 use App\Entity\EntityInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Exception\ValidatorException;
 
+/**
+ * Quick and dirty methods which should be located in event listeners in an ideal world.
+ */
 trait ControllerHelper
 {
     /**
@@ -58,5 +62,12 @@ trait ControllerHelper
 
             throw new ValidatorException($message);
         }
+    }
+
+    public function getJsonResponse($entity, array $serializationGroups = ['index'])
+    {
+        return new Response($this->serializer->serialize($entity, 'json', ['groups' => $serializationGroups]), Response::HTTP_OK, [
+            ['Content-Type' => 'application/json']
+        ]);
     }
 }
