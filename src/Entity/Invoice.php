@@ -225,4 +225,26 @@ class Invoice implements EntityInterface
     {
         return $this->publishedAt;
     }
+
+    /**
+     * @Groups({"index", "get"})
+     */
+    public function getTotal(): float
+    {
+        return round(array_reduce($this->items->toArray(), function($carry, Item $item) {
+            $carry += $item->getPrice();
+            return $carry;
+        }), 2);
+    }
+
+    /**
+     * @Groups({"index", "get"})
+     */
+    public function getTotalEur(): float
+    {
+        return round(array_reduce($this->items->toArray(), function($carry, Item $item) {
+            $carry += $item->getPriceEur();
+            return $carry;
+        }), 2);
+    }
 }
