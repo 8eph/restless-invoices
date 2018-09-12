@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Swagger\Annotations as SWG;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Component\Routing\Annotation\Route;
 
 class InvoiceController
@@ -33,6 +35,18 @@ class InvoiceController
     }
 
     /**
+     * Get all Invoices
+     *
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns a collection of Invoices",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=Invoice::class, groups={"index"}))
+     *     )
+     * )
+     * @SWG\Tag(name="Invoices")
+     *
      * @Route("/invoices/all", name="get_invoices", methods={"GET"})
      *
      * @return Response
@@ -43,6 +57,16 @@ class InvoiceController
     }
 
     /**
+     * Get a single Invoice
+     *
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns a single Invoice",
+     *     @Model(type=Invoice::class, groups={"index"})
+     * )
+     *
+     * @SWG\Tag(name="Invoices")
+     *
      * @Route("/invoices/{invoiceId}", name="get_invoice", methods={"GET"}, requirements={"invoiceId"="\d+"})
      *
      * @param $invoiceId
@@ -58,6 +82,22 @@ class InvoiceController
     }
 
     /**
+     * Create a new Invoice
+     *
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns a single Invoice",
+     *     @Model(type=Invoice::class, groups={"index"})
+     * )
+     * @SWG\Parameter(
+     *     name="body",
+     *     in="body",
+     *     required=true,
+     *     @Swg\Schema(ref=@Model(type=Invoice::class, groups={"create"}))
+     * )
+     *
+     * @SWG\Tag(name="Invoices")
+     *
      * @Route("/invoices", name="post_invoice", methods={"POST"})
      *
      * @param Request $request
@@ -82,6 +122,23 @@ class InvoiceController
     }
 
     /**
+     * Generates a Credit invoice for a given invoiceId
+     *
+     * Invoices can be cancelled, you cancel an invoice by "crediting" it or by creating a credit note for it.
+     * A credit note is also an invoice but with all the negative values.
+     *
+     * Comment:
+     * This endpoint might be more suited as a DELETE verb from a business logic perspective,
+     * however since resource creation is involved, I opted for POST.
+     *
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns a single Invoice of type Credit",
+     *     @Model(type=Invoice::class, groups={"index"})
+     * )
+     *
+     * @SWG\Tag(name="Invoices")
+
      * @Route("/invoices/{invoiceId}/credit", name="post_invoice_credit", methods={"POST"})
      *
      * @param int $invoiceId
@@ -111,6 +168,8 @@ class InvoiceController
     }
 
     /**
+     * Partial update of an Invoice
+     *
      * Intentionally ignoring this:
      *      https://williamdurand.fr/2014/02/14/please-do-not-patch-like-an-idiot/
      *
@@ -119,6 +178,20 @@ class InvoiceController
      * On the other hand, I don't see a strong case here for a classic PUT (replacement of a resource)
      * when the front-end can just send the whole model on every modification.
      * Open for discussion on both these points.
+     *
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns a single updated Invoice. Will erase any items, if set",
+     *     @Model(type=Invoice::class, groups={"index"})
+     * )
+     * @SWG\Parameter(
+     *     name="body",
+     *     in="body",
+     *     required=true,
+     *     @Swg\Schema(ref=@Model(type=Invoice::class, groups={"create"}))
+     * )
+     *
+     * @SWG\Tag(name="Invoices")
      *
      * @Route("/invoices/{invoiceId}", name="patch_invoice", methods={"PATCH"}, requirements={"invoiceId"="\d+"})
      *
@@ -147,6 +220,46 @@ class InvoiceController
     }
 
     /**
+     * Search for Invoices
+     *
+     * Takes GET parameters.
+     *
+     * Raw usage: "?status=draft|real&currency=JPY&name=INV"
+     *
+     * @SWG\Response(
+     *     response=200,
+     *     description="Searches for a collection of Invoices by query string",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=Invoice::class, groups={"index"}))
+     *     )
+     * )
+     * @SWG\Parameter(
+     *     name="name",
+     *     description="Name of the Invoice that needs to be fetched. Matches via wildcard",
+     *     in="query",
+     *     required=false,
+     *     type="string"
+     * )
+     *
+     * @SWG\Parameter(
+     *     name="currency",
+     *     description="Currency of the Invoice that needs to be fetched",
+     *     in="query",
+     *     required=false,
+     *     type="string"
+     * )
+     *
+     * @SWG\Parameter(
+     *     name="status",
+     *     description="Status of the Invoice that needs to be fetched (accepts draft, published|real)",
+     *     in="query",
+     *     required=false,
+     *     type="string"
+     * )
+     *
+     * @SWG\Tag(name="Invoices")
+     *
      * @Route("/invoices/search", name="get_invoices_search", methods={"GET"})
      *
      * @param Request $request

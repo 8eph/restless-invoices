@@ -27,7 +27,7 @@ class Invoice implements EntityInterface
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"index", "get", "create", "update"})
+     * @Groups({"index", "get"})
      */
     protected $id;
 
@@ -51,7 +51,7 @@ class Invoice implements EntityInterface
     protected $createdAt;
 
     /**
-     * @ORM\Column(type="datetimetz")
+     * @ORM\Column(type="datetimetz", nullable=true)
      * @Groups({"index", "get"})
      */
     protected $publishedAt;
@@ -65,6 +65,7 @@ class Invoice implements EntityInterface
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"index", "get", "create", "update"})
      */
     protected $paid = self::NOT_PAID;
 

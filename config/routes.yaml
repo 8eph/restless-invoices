@@ -1,9 +1,4 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
-
-app_routes:
-    type: rest
-    resource: 'config/invoices_routes.yml'
-    prefix: /api
-
+app.swagger_ui:
+    path: /api/doc
+    methods: GET
+    defaults: { _controller: nelmio_api_doc.controller.swagger_ui }

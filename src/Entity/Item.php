@@ -16,7 +16,7 @@ class Item implements EntityInterface
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"index", "get", "create", "update"})
+     * @Groups({"index", "get"})
      */
     protected $id;
 

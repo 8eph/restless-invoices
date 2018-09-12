@@ -35,3 +35,6 @@ services:
     App\Doctrine\StatusChangeEnforcementListener:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
+    App\EventListener\ExceptionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }
