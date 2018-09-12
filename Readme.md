@@ -1,7 +1,10 @@
 # Requirements
 [Docker CE](https://docs.docker.com/install/#supported-platforms)
+
 [Docker compose](https://docs.docker.com/compose/install/)
+
 A real computer (looking at you, Apple)
+
 # How to run
 
 ```
